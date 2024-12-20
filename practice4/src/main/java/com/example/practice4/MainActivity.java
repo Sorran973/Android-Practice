@@ -30,17 +30,8 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        IntentFilter filter = new IntentFilter("android.intent.action.AIRPLANE_MODE");
-        myBroadcastReceiver = new MyBroadcastReceiver();
-        registerReceiver(myBroadcastReceiver, filter);
-
         buttonStartService = findViewById(R.id.buttonStart);
-        buttonStartService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startService(new Intent(MainActivity.this, MyServiceMediaPlayer.class));
-            }
-        });
+        buttonStartService.setOnClickListener(view -> startService(new Intent(MainActivity.this, MyServiceMediaPlayer.class)));
 
         buttonStopService = findViewById(R.id.buttonStop);
         buttonStopService.setOnClickListener(new View.OnClickListener() {
@@ -52,8 +43,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter("android.intent.action.AIRPLANE_MODE");
+        myBroadcastReceiver = new MyBroadcastReceiver();
+        registerReceiver(myBroadcastReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         unregisterReceiver(myBroadcastReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
     }
 }
